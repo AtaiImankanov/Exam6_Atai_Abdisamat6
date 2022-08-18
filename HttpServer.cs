@@ -117,7 +117,7 @@ namespace ExamTask
             if (filename.Contains("html"))
 
             {
-                
+
                 if (context.Request.HttpMethod == "POST" && filename.Contains("index"))
                 {
                     StreamReader reader = new StreamReader(context.Request.InputStream);
@@ -133,23 +133,59 @@ namespace ExamTask
                     Task addTask = new Task(tasks.Count + 1, Header, Name, Description);
                     tasks.Add(addTask);
                     content = BuildHtml(filename, tasks);
-                    context.Response.Headers.Add(HttpResponseHeader.Location, "/index.html");
                     File.WriteAllText("C:/Users/imank/Desktop/exam6/Exam6/tasks.json", JsonSerializer.Serialize(tasks));
+                    tasks = JsonSerializer.Deserialize<List<Task>>(File.ReadAllText("../../../tasks.json"));
+                    context.Response.Headers.Add(HttpResponseHeader.Location, "/index.html");
+
                 }
-                if ( context.Request.HttpMethod != "POST" && filename.Contains("index" ))
+                if (context.Request.HttpMethod != "POST" && filename.Contains("index") && context.Request.Url.Query=="")
                 {
                    content= BuildHtml(filename, tasks);
 
                 }
 
-                if(context.Request.HttpMethod == "GET" && filename.Contains("task"))
+                if(context.Request.HttpMethod == "GET" && filename.Contains("task") && (!context.Request.Url.Query.Contains("done") || !context.Request.Url.Query.Contains("dlt")))
                 { 
                     string query1 = context.Request.Url.Query;
                     //sdfs ? 3
                     int  a= Convert.ToInt32(query.Substring(query.IndexOf("?") + 1));
-                    content = BuildHtml(filename, tasks[a]);
+                    content = BuildHtml(filename, tasks[a-1]);
 
                 }
+                if (context.Request.HttpMethod == "GET" && filename.Contains("index")&& context.Request.Url.Query.Contains("done") || context.Request.Url.Query.Contains("dlt"))
+                {
+                    string query1 = context.Request.Url.Query.Replace("?","");
+                    //http?3=dlt
+                    string b = query.Substring(query.IndexOf("=") +1);
+                    int a = Convert.ToInt32(query1.Substring(0, query1.IndexOf("=")));
+                    int oper = 0;
+                    if (b == "dlt")
+                    {
+                        for (int i = 0; i < tasks.Count; i++)
+                        {
+                            if (tasks[i].Id == a)
+                            {
+                                oper = i;
+                            }
+                        }
+                        tasks.Remove(tasks[oper]);
+                    }
+                    else
+                    {
+                        foreach (var item in tasks)
+                        {
+                            if (item.Id == a)
+                            {
+                                item.Status="done";
+                            }
+                        }
+                    }
+                    File.WriteAllText("C:/Users/imank/Desktop/exam6/Exam6/tasks.json", JsonSerializer.Serialize(tasks));
+                    tasks = JsonSerializer.Deserialize<List<Task>>(File.ReadAllText("../../../tasks.json"));
+                    context.Response.Headers.Add(HttpResponseHeader.Location, "/index.html");
+                    content = BuildHtml(filename, tasks);
+                }
+
             }
 
             else
