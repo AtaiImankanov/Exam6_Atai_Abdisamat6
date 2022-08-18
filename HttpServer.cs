@@ -46,16 +46,13 @@ namespace ExamTask
         public void Stop()
 
         {
-
             _serverThread.Abort();
 
             _listener.Stop();
-
         }
         private void Listen()
 
         {
-
             _listener = new HttpListener();
 
             _listener.Prefixes.Add("http://localhost:" + _port.ToString() + "/");
@@ -63,7 +60,6 @@ namespace ExamTask
             _listener.Start();
 
             while (true)
-
             {
 
                 try
