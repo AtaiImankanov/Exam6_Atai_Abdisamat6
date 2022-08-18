@@ -70,12 +70,9 @@ namespace ExamTask
 
                 {
 
-                    // Пришел запрос получаем так называемый контекст запроса
-
                     HttpListenerContext context = _listener.GetContext();
 
 
-                    // И передаем этот контекст на обработку
 
                     Process(context);
 
@@ -100,13 +97,7 @@ namespace ExamTask
 
             Console.WriteLine(filename);
 
-
-            // Убираем слэш в начале имени
-
             filename = filename.Substring(1);
-
-
-            // Формируем полный путь к файлу
 
             filename = Path.Combine(_siteDirectory, filename);
 
@@ -122,7 +113,7 @@ namespace ExamTask
                 {
                     StreamReader reader = new StreamReader(context.Request.InputStream);
                     string postansw = reader.ReadToEnd();
-                    //"Header=Header&Name=Ata&Description=Des"
+                    
                     string[] split = postansw.Split('&');
                     int posH = split[0].IndexOf("=");
                     int posA = split[1].IndexOf("=");
@@ -147,7 +138,7 @@ namespace ExamTask
                 if(context.Request.HttpMethod == "GET" && filename.Contains("task") && (!context.Request.Url.Query.Contains("done") || !context.Request.Url.Query.Contains("dlt")))
                 { 
                     string query1 = context.Request.Url.Query;
-                    //sdfs ? 3
+                    
                     int  a= Convert.ToInt32(query.Substring(query.IndexOf("?") + 1));
                     content = BuildHtml(filename, tasks[a-1]);
 
@@ -155,7 +146,7 @@ namespace ExamTask
                 if (context.Request.HttpMethod == "GET" && filename.Contains("index")&& context.Request.Url.Query.Contains("done") || context.Request.Url.Query.Contains("dlt"))
                 {
                     string query1 = context.Request.Url.Query.Replace("?","");
-                    //http?3=dlt
+                    
                     string b = query.Substring(query.IndexOf("=") +1);
                     int a = Convert.ToInt32(query1.Substring(0, query1.IndexOf("=")));
                     int oper = 0;
@@ -190,8 +181,7 @@ namespace ExamTask
 
             else
 
-            {
-
+            {  
                 content = File.ReadAllText(filename);
 
             }
@@ -207,7 +197,6 @@ namespace ExamTask
                     byte[] htmlBytes = System.Text.Encoding.UTF8.GetBytes(content);
 
                     Stream fileStream = new MemoryStream(htmlBytes);
-
 
 
                     context.Response.ContentType = GetContentType(filename);
@@ -227,7 +216,6 @@ namespace ExamTask
                     do
 
                     {
-
 
                         dataLength = fileStream.Read(buffer, 0, buffer.Length);
 
@@ -303,18 +291,14 @@ namespace ExamTask
 
             string filePath = Path.Combine(_siteDirectory, filename);
 
-
-            var razorService = Engine.Razor; // Подключаем движок
-
-
-            if (!razorService.IsTemplateCached("layout", null)) // Проверяем наличие базового шаблона в кэше
-
-                razorService.AddTemplate("layout", File.ReadAllText(layoutPath)); //Добавляем его если отсутствует
+            var razorService = Engine.Razor; 
 
 
+            if (!razorService.IsTemplateCached("layout", null)) 
 
+                razorService.AddTemplate("layout", File.ReadAllText(layoutPath)); 
 
-            if (!razorService.IsTemplateCached(filename, null))//Находим шаблон страницы который будет вложен в базовый
+            if (!razorService.IsTemplateCached(filename, null))
 
             {
 
