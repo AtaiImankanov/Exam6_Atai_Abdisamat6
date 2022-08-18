@@ -142,7 +142,14 @@ namespace ExamTask
 
                 }
 
+                if(context.Request.HttpMethod == "GET" && filename.Contains("task"))
+                { 
+                    string query1 = context.Request.Url.Query;
+                    //sdfs ? 3
+                    int  a= Convert.ToInt32(query.Substring(query.IndexOf("?") + 1));
+                    content = BuildHtml(filename, tasks[a]);
 
+                }
             }
 
             else
