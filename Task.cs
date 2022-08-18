@@ -4,6 +4,7 @@ using System.Text;
 
 namespace ExamTask
 {
+    
     internal class Task
     {
         public int Id { get; set; }
@@ -13,14 +14,15 @@ namespace ExamTask
         public DateTime DateTime { get; set; }
         public string Status { get; set; }
 
-        public Task(int id, string name, string header, string description, string status)
+        public Task() { }
+        public Task(int id, string name, string header, string description)
         {
             Id = id;
             Name = name;
             Header = header;
             Description = description;
             DateTime = DateTime.Now;
-            Status = status;
+            Status = "new";
         }
     }
 }

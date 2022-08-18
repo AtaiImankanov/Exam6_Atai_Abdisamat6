@@ -15,14 +15,14 @@ namespace ExamTask
         private Thread _serverThread;
         private string _siteDirectory;
 
-        private HttpListener _listener;
-
+        private HttpListener _listener;   
         private int _port;
-
+        List<Task> tasks = new List<Task>() ;
+       
         public Http(string path, int port)
 
         {
-
+            tasks=JsonSerializer.Deserialize<List<Task>>(File.ReadAllText("../../../tasks.json")) ;
             this.Initialize(path, port);
 
         }
@@ -117,11 +117,28 @@ namespace ExamTask
             if (filename.Contains("html"))
 
             {
-                content = BuildHtml(filename, query);
+                
                 if (context.Request.HttpMethod == "POST" && filename.Contains("index"))
                 {
                     StreamReader reader = new StreamReader(context.Request.InputStream);
-                    string c = reader.ReadToEnd();
+                    string postansw = reader.ReadToEnd();
+                    //"Header=Header&Name=Ata&Description=Des"
+                    string[] split = postansw.Split('&');
+                    int posH = split[0].IndexOf("=");
+                    int posA = split[1].IndexOf("=");
+                    int posD = split[2].IndexOf("=");
+                    string Header = split[0].Substring(posH + 1);
+                    string Name = split[1].Substring(posA + 1);
+                    string Description = split[2].Substring(posD + 1);
+                    Task addTask = new Task(tasks.Count + 1, Header, Name, Description);
+                    tasks.Add(addTask);
+                    content = BuildHtml(filename, tasks);
+                    context.Response.Headers.Add(HttpResponseHeader.Location, "/index.html");
+                    File.WriteAllText("C:/Users/imank/Desktop/exam6/Exam6/tasks.json", JsonSerializer.Serialize(tasks));
+                }
+                if ( context.Request.HttpMethod != "POST" && filename.Contains("index" ))
+                {
+                   content= BuildHtml(filename, tasks);
 
                 }
 
@@ -266,10 +283,16 @@ namespace ExamTask
                 razorService.Compile(filename);
 
             }
-
-
+            int isNull=1;
+            if (result == null )
+            {
+                isNull = 0;
+                result = new int[] {1,2,3,4,5};
+            }
+            
             html = razorService.Run(filename, null, new
             {
+                Isnull = isNull,
                 Result = result
             });
 
