@@ -252,9 +252,6 @@ namespace ExamTask
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
                 }
-
-
-
             }
 
             else
